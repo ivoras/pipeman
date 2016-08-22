@@ -1,0 +1,22 @@
+{
+    "type": "pipeman",
+    "port": 4096,
+    "buffer_size": 64,
+    "network": [
+        {
+            "name": "red",
+            "nodes": ["eenie", "meanie"],
+            "loss": 0
+        },
+        {
+            "name": "green",
+            "nodes": ["meanie", "mynie"],
+            "loss": 0.5
+        },
+        {
+            "name": "blue",
+            "nodes": ["meanie", "moe"],
+            "loss": 0.1
+        }
+    ]
+}
