@@ -10,11 +10,11 @@ type PipemanConfig struct {
 	Type       string         `json:"type"`
 	Port       int            `json:"port"`
 	BufferSize int            `json:"buffer_size"`
-	Network    []PipemanGroup `json:"network"`
+	Network    []PipemanDomain `json:"network"`
 }
 
 // PipemanGroup holds a list of nodes belonging to the same group, with some metadata
-type PipemanGroup struct {
+type PipemanDomain struct {
 	Name  string   `json:"name"`
 	Nodes []string `json:"nodes"`
 	Loss  float32  `json:"loss"`
