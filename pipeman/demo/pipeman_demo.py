@@ -1,4 +1,4 @@
-import sys,os,socket,select
+import sys,os,socket,select,time
 from threading import Thread
 
 HOST = 'localhost'
@@ -9,19 +9,21 @@ def worker(name):
     cn = socket.create_connection((HOST, PORT))
     cn.sendall(b"%s\n" % bname)
     x = 0
+    tm = time.time()
     while True:
-        r, w, e = select.select([cn.fileno()], [], [], 1)
+        r, w, e = select.select([cn.fileno()], [], [], 0.1)
         if len(r) > 0:
             while True:
                 buf = cn.recv(4096)
                 print("%s received: %s" % (name, repr(buf)))
                 if len(buf) != 4096:
                     break
-            
-        cn.sendall(b"%s%d\n" % (bname, x))
-        x += 1
-        if x == 10:
-            break
+        if time.time() - tm >= 1: # every second
+            cn.sendall(b"%s%d\n" % (bname, x))
+            x += 1
+            if x == 10:
+                break
+            tm = time.time()
     print("exit", name)
 
 
