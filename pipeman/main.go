@@ -17,6 +17,9 @@ var AllNodes map[string]*NetNode
 // AllDomains is the global list of all domains
 var AllDomains []NetDomain
 
+// Verbose is the global log level
+var Verbose bool
+
 func showUsage() {
 	fmt.Println("usage:", os.Args[0], "[-c config.json]")
 }
@@ -38,6 +41,9 @@ func handleConnection(conn *net.TCPConn) {
 			line := string(bline)
 			if nn, ok := AllNodes[line]; ok {
 				nn.Conn = conn
+				if Verbose {
+					log.Println(conn, "is", line)
+				}
 				nn.NetNodeRun()
 			} else {
 				log.Fatalln("First line in config state needs to be the node name for:", conn)
@@ -52,6 +58,7 @@ func main() {
 	var configFile string
 	flag.StringVar(&configFile, "config", "config.json", "Config file name")
 	flag.StringVar(&configFile, "c", "config.json", "Short for config file name")
+	flag.BoolVar(&Verbose, "-v", false, "Verbose output")
 	flag.Parse()
 
 	if _, err := os.Stat(configFile); err != nil {
@@ -101,6 +108,9 @@ func main() {
 		if err != nil {
 			log.Println("Error accepting connection:", err)
 			break
+		}
+		if Verbose {
+			log.Println(conn)
 		}
 		go handleConnection(conn)
 	}

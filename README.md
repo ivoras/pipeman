@@ -32,8 +32,8 @@ This JSON config file describes a network with three broadcast domains and four 
 Here's what's happening:
 
 * The nodes are "eenie", "meanie", "mynie" and "moe"
-* "eenie" and "meanie" are in a broadcast domain named "red", "meanie" and "mynie" are in their own broadcast domain named "green", and "meanie" and "moe" are in their own, named "blue". For example, whatever the "eenie" node sends, get received by "meanie". Note that nodes can belong to multiple domains. If the nodes (re)broadcast messages, loops are naturally possible.
-* Domains "green" and "blue" have a certain chance of data loss, 0.5 and 0.1 (in the range of 0 = never and 1 = always) 
+* "eenie" and "meanie" are in a broadcast domain named "red", "meanie" and "mynie" are in their own broadcast domain named "green", and "meanie" and "moe" are in their own, named "blue". For example, whatever the "eenie" node sends, is received by "meanie". Note that nodes can belong to multiple domains. If the nodes (re)broadcast messages, loops are naturally possible.
+* Domains "green" and "blue" have a certain random chance of data loss, 0.5 and 0.1 (in the range of 0 = never and 1 = always) 
 
 ## Buffer size and data loss
 
@@ -44,4 +44,4 @@ Data is always read and written by the server in chunks of `buffer_size`, and ra
 
 ## The protocol 
 
-The protocol used is (currently) very simple: As soon as a node connects to the server it must send its name followed by a newline. Immediately after that, it can send (and) receive whatever data it needs to.
+The protocol used is (currently) very simple: As soon as a node connects to the server it must send its name (case sensitive) followed by a newline. Immediately after that, it can send (and) receive whatever data it needs to.
