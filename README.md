@@ -1,6 +1,6 @@
-# Pipeman broadcast domains network simulator v0.5
+# Pipeman: a simulator of networked broadcast domains, v0.5
 
-Pipeman is a nondeterministic simulator of broadcast domains in networks, using TCP. Multiple broadcast domains can be specified in a JSON file, and the server listens for connections from ordinary TCP clients. Each `send()` event from a client gets broadcast to all the other nodes in the client's broadcast groups, possibly with a certain chance for data loss. It's useful for experimenting with wireless mesh protocols.
+Pipeman is a nondeterministic simulator of broadcast domains organized into networks, using simple TCP. Multiple broadcast domains can be specified in a JSON file, and the server listens for connections from ordinary TCP clients. Each `send()` event from a client gets broadcast to all the other nodes in the client's broadcast groups, possibly with a certain chance for data loss. It's useful for experimenting with wireless mesh protocols.
 
 ## Example
 
