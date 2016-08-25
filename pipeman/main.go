@@ -21,7 +21,7 @@ var AllDomains []NetDomain
 var Verbose bool
 
 func showUsage() {
-	fmt.Println("usage:", os.Args[0], "[-c config.json]")
+	fmt.Println("usage:", os.Args[0], "[-c config.json] [-v]")
 }
 
 // Handles the config phase of the connection
@@ -31,7 +31,7 @@ func handleConnection(conn *net.TCPConn) {
 	for {
 		r, err := conn.Read(buf)
 		if err != nil {
-			log.Fatalln("Error reading config line from:", conn)
+			log.Fatalln("Error reading config line from:", *conn)
 			return
 		}
 		if r != 1 {
@@ -46,11 +46,19 @@ func handleConnection(conn *net.TCPConn) {
 				}
 				nn.NetNodeRun()
 			} else {
-				log.Fatalln("First line in config state needs to be the node name for:", conn)
+				log.Fatalln("First line in config state needs to be the node name for:", *conn)
 			}
 			return
 		}
 		bline = append(bline, buf[0])
+	}
+}
+
+// TearDownNode is called when the node disconnects. It expects that the connection lock is held.
+func TearDownNode(nn *NetNode) {
+	if nn.Conn != nil {
+		nn.Conn.Close()
+		nn.Conn = nil
 	}
 }
 
@@ -61,6 +69,8 @@ func main() {
 	flag.BoolVar(&Verbose, "v", false, "Verbose output")
 	flag.Parse()
 
+	var err error
+
 	if _, err := os.Stat(configFile); err != nil {
 		fmt.Printf("Config file not found: '%s'\n", configFile)
 		showUsage()
@@ -68,13 +78,15 @@ func main() {
 		return
 	}
 
-	Cfg, err := ReadConfig(configFile)
+	Cfg, err = ReadConfig(configFile)
 	if err != nil {
 		fmt.Printf("Cannot parse config file: '%s': %v\n", configFile, err)
 		return
 	}
 
-	fmt.Println(Cfg)
+	if Verbose {
+		fmt.Println(Cfg)
+	}
 
 	// Parse the config into NetNode and NetDomain slices
 	AllNodes = make(map[string]*NetNode)
@@ -95,6 +107,7 @@ func main() {
 		AllDomains[di].Nodes = make([]*NetNode, len(Cfg.Network[di].Nodes))
 		for ni, nname := range Cfg.Network[di].Nodes {
 			AllDomains[di].Nodes[ni] = AllNodes[nname]
+			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &AllDomains[di])
 		}
 	}
 
@@ -103,6 +116,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error creating a TCP listener:", err)
 	}
+
 	for {
 		conn, err := srv.AcceptTCP()
 		if err != nil {
