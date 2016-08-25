@@ -7,7 +7,7 @@ PORT = 4096
 def worker(name):
     bname = name.encode('utf-8')
     cn = socket.create_connection((HOST, PORT))
-    cn.sendall(b"%s\n" % bname)
+    cn.sendall(b"%s\n" % bname) # Send the node name as the first thing
     x = 0
     tm = time.time()
     while True:
@@ -21,7 +21,7 @@ def worker(name):
         if time.time() - tm >= 1: # every second
             cn.sendall(b"%s%d\n" % (bname, x))
             x += 1
-            if x == 10:
+            if x == 10: # send 10 messages
                 break
             tm = time.time()
     print("exit", name)
