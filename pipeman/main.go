@@ -58,7 +58,7 @@ func main() {
 	var configFile string
 	flag.StringVar(&configFile, "config", "config.json", "Config file name")
 	flag.StringVar(&configFile, "c", "config.json", "Short for config file name")
-	flag.BoolVar(&Verbose, "-v", false, "Verbose output")
+	flag.BoolVar(&Verbose, "v", false, "Verbose output")
 	flag.Parse()
 
 	if _, err := os.Stat(configFile); err != nil {

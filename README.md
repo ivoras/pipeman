@@ -45,3 +45,15 @@ Data is always read and written by the server in chunks of `buffer_size`, and ra
 ## The protocol 
 
 The protocol used is (currently) very simple: As soon as a node connects to the server it must send its name (case sensitive) followed by a newline. Immediately after that, it can send (and) receive whatever data it needs to.
+
+## Command line usage
+
+    usage: pipeman.exe [-c config.json]
+    -v
+            Verbose output
+    -c string
+            Short for config file name (default "config.json")
+    -config string
+            Config file name (default "config.json")
+
+The usual command line for starting Pipeman is `pipeman -c config.json`.
