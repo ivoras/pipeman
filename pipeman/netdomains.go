@@ -21,6 +21,9 @@ func (dom *NetDomain) FanoutBuffer(buf []byte, sender *NetNode) {
 			continue
 		}
 		if rand.Float32() < dom.CfgDomain.Loss {
+			if Verbose {
+				log.Println("Lost", len(buf), "bytes in delivery to", nn.Name)
+			}
 			continue
 		}
 		nn.ConnLock.Lock()
