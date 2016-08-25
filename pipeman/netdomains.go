@@ -13,9 +13,9 @@ type NetDomain struct {
 }
 
 // FanoutBuffer distributes the data in the given buf to the nodes in this domain
-func (dom *NetDomain) FanoutBuffer(buf []byte) {
+func (dom *NetDomain) FanoutBuffer(buf []byte, sender *NetNode) {
 	for _, nn := range dom.Nodes {
-		if nn.Conn == nil {
+		if nn == sender || nn.Conn == nil {
 			continue
 		}
 		if rand.Float32() < dom.CfgDomain.Loss {
@@ -43,7 +43,7 @@ func (nn *NetNode) NetNodeRun() {
 		}
 		rbuf := buf[:rsize]
 		for _, dom := range nn.Domains {
-			dom.FanoutBuffer(rbuf)
+			dom.FanoutBuffer(rbuf, nn)
 		}
 	}
 }
