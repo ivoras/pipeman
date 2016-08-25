@@ -76,11 +76,8 @@ func (nn *NetNode) NetNodeRun() {
 			TearDownNode(nn)
 			break
 		}
-		if rsize == 0 {
-			continue
-		}
 		if Verbose {
-			log.Println(nn.Name, "sent", rsize, "bytes", "; fanning to", len(nn.Domains), "domains")
+			log.Println(nn.Name, "sent", rsize, "bytes", "; fanning out to", len(nn.Domains), "domains")
 		}
 		rbuf := buf[:rsize]
 		for _, dom := range nn.Domains {
