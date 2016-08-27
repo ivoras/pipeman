@@ -46,7 +46,7 @@ This example network can be visualised like in the following diagram:
 Data is always read and written by the server in chunks of `buffer_size`, and random data loss chance is always calculated for such a buffer before data is received by each individual node. Consider the following extreme cases:
 
 * `buffer_size = 1` means there is a chance of data loss for every single byte, in each domain where `loss` is non-zero. It's also very inefficient.
-* Setting `loss` to 0 in each domain, and having a large `buffer_size` (for example 16384) results in very efficient operation, but without data loss simulation.
+* Setting `loss` to 0 in each domain (i.e. leaving it unconfigured), and having a large `buffer_size` (for example 16384) results in very efficient operation, but without data loss simulation.
 
 ## The protocol 
 
