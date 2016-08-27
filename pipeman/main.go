@@ -40,6 +40,10 @@ func handleConnection(conn *net.TCPConn) {
 		if buf[0] == '\n' {
 			line := string(bline)
 			if nn, ok := AllNodes[line]; ok {
+				if nn.Conn != nil {
+					log.Println("Node", line, "already connected! Refusing another connection.")
+					return
+				}
 				nn.Conn = conn
 				if Verbose {
 					log.Println(conn, "is", line)
