@@ -35,7 +35,7 @@ Here's what's happening:
 * The nodes are named "eenie", "meanie", "mynie" and "moe"
 * "eenie" and "meanie" are in a broadcast domain named "red", "meanie" and "mynie" are in their own broadcast domain named "green", and "meanie" and "moe" are in their own, named "blue". For example, whatever the "eenie" node sends, is received by "meanie". Note that nodes can belong to multiple domains. If the nodes (re)broadcast messages, loops are naturally possible ("broadcast storms") and there are no guards against this case.
 * Domains "green" and "blue" have a certain random chance of data loss, 0.5 and 0.1 (in the range of 0 = never and 1 = always)
-* Domain "green" has a 100 +/- 10 ms jitter in delivery
+* Domain "green" has a 100 +/- 10 ms jitter in delivery. Jitter precision is only as good as what Go's time.Sleep() provides.
 
 This example network can be visualised like in the following diagram:
 
