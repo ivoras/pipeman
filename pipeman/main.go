@@ -50,7 +50,7 @@ func handleConnection(conn *net.TCPConn) {
 				}
 				nn.NetNodeRun()
 			} else {
-				log.Fatalln("First line in config state needs to be the node name for:", *conn)
+				log.Fatalln("First line in new connection needs to be the node name for:", *conn)
 			}
 			return
 		}
@@ -147,20 +147,22 @@ func main() {
 		}
 	}
 
+	if Verbose {
+		log.Println("Working with", len(AllDomains), "domains and", len(AllNodes), "nodes.")
+	}
+
 	addr := net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: Cfg.Port}
 	srv, err := net.ListenTCP("tcp", &addr)
 	if err != nil {
 		log.Fatalln("Error creating a TCP listener:", err)
 	}
 
+	// Main accept() loop
 	for {
 		conn, err := srv.AcceptTCP()
 		if err != nil {
 			log.Println("Error accepting connection:", err)
 			break
-		}
-		if Verbose {
-			log.Println(conn)
 		}
 		go handleConnection(conn)
 	}
