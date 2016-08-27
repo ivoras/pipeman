@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net"
 	"sync"
+	"time"
 )
 
 // NetDomain represents a broadcast domain. It holds metadata and a list of nodes.
@@ -14,10 +15,38 @@ type NetDomain struct {
 	Nodes     []*NetNode
 }
 
-// FanoutBuffer distributes the data in the given buf to the nodes in this domain
-func (dom *NetDomain) FanoutBuffer(buf []byte, sender *NetNode) {
+func (dom *NetDomain) fanoutBufferToNode(buf []byte, nn *NetNode) {
+	nn.ConnLock.Lock()
+	if nn.Conn == nil {
+		nn.ConnLock.Unlock()
+		return
+	}
+	if len(dom.CfgDomain.Jitter) == 2 {
+		// Jitter is given as jitter[0] ms +/- jitter[1] ms
+		sleepMs := dom.CfgDomain.Jitter[0] + (rand.Int31n(2*dom.CfgDomain.Jitter[1]) - dom.CfgDomain.Jitter[1])
+		if Verbose {
+			log.Println("Sleeping", sleepMs, "ms before delivering", len(buf), "bytes to", nn.Name)
+		}
+		time.Sleep(time.Duration(sleepMs) * time.Millisecond)
+	}
+	_, err := nn.Conn.Write(buf)
+	if err != nil {
+		if Verbose {
+			if err == io.EOF {
+				log.Println("Node has disconnected:", nn.Name)
+			} else {
+				log.Println("Error reading connection:", nn.Name, err)
+			}
+		}
+		tearDownNode(nn)
+	}
+	nn.ConnLock.Unlock()
+}
+
+// FanoutBuffer distributes the data in the given buf to all the nodes in this domain
+func (dom *NetDomain) fanoutBuffer(buf []byte, sender *NetNode) {
 	for _, nn := range dom.Nodes {
-		if nn == sender {
+		if nn == sender || nn.Conn == nil {
 			continue
 		}
 		if rand.Float32() < dom.CfgDomain.Loss {
@@ -26,23 +55,7 @@ func (dom *NetDomain) FanoutBuffer(buf []byte, sender *NetNode) {
 			}
 			continue
 		}
-		nn.ConnLock.Lock()
-		if nn.Conn == nil {
-			nn.ConnLock.Unlock()
-			continue
-		}
-		_, err := nn.Conn.Write(buf)
-		if err != nil {
-			if Verbose {
-				if err == io.EOF {
-					log.Println("Node has disconnected:", nn.Name)
-				} else {
-					log.Println("Error reading connection", nn.Name, err)
-				}
-			}
-			TearDownNode(nn)
-		}
-		nn.ConnLock.Unlock()
+		go dom.fanoutBufferToNode(buf, nn)
 	}
 }
 
@@ -73,7 +86,9 @@ func (nn *NetNode) NetNodeRun() {
 					log.Println("Error reading connection", nn.Name, err)
 				}
 			}
-			TearDownNode(nn)
+			nn.ConnLock.Lock()
+			tearDownNode(nn)
+			nn.ConnLock.Unlock()
 			break
 		}
 		if Verbose {
@@ -81,7 +96,7 @@ func (nn *NetNode) NetNodeRun() {
 		}
 		rbuf := buf[:rsize]
 		for _, dom := range nn.Domains {
-			dom.FanoutBuffer(rbuf, nn)
+			dom.fanoutBuffer(rbuf, nn)
 		}
 	}
 }

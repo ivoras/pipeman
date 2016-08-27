@@ -7,17 +7,18 @@ import (
 
 // PipemanConfig holds the JSON configuration structure for Pipeman
 type PipemanConfig struct {
-	Type       string         `json:"type"`
-	Port       int            `json:"port"`
-	BufferSize int            `json:"buffer_size"`
+	Type       string          `json:"type"`
+	Port       int             `json:"port"`
+	BufferSize uint32          `json:"buffer_size"`
 	Network    []PipemanDomain `json:"network"`
 }
 
-// PipemanGroup holds a list of nodes belonging to the same group, with some metadata
+// PipemanDomain holds a list of nodes belonging to the same group, with some metadata
 type PipemanDomain struct {
-	Name  string   `json:"name"`
-	Nodes []string `json:"nodes"`
-	Loss  float32  `json:"loss"`
+	Name   string   `json:"name"`
+	Nodes  []string `json:"nodes"`
+	Loss   float32  `json:"loss"`
+	Jitter []int32  `json:"jitter"`
 }
 
 // ReadConfig reads a config file and returns the parsed PipemanConfig struct
