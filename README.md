@@ -2,6 +2,8 @@
 
 Pipeman is a nondeterministic simulator of broadcast domains organized into networks, using simple TCP. Multiple broadcast domains can be specified in a JSON file, and the server listens for connections from ordinary TCP clients. Each `send()` event from a client gets broadcast to all the other nodes in the client's broadcast domains, optionally  with a certain chance for data loss. It's useful for experimenting with wireless mesh protocols.
 
+Pipeman uses Goroutines to perform all the simulated asynchronous tasks. While it's not an absolute guarantee of nondeterministic runs, it's pretty close to it.
+
 ## Example
 
 This JSON config file describes a network with three broadcast domains and four nodes:
