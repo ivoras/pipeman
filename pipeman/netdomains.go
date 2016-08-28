@@ -91,10 +91,11 @@ func (nn *NetNode) NetNodeRun() {
 			nn.ConnLock.Unlock()
 			break
 		}
+		rbuf := make([]byte, rsize)
+		copy(rbuf, buf)
 		if Verbose {
-			log.Println(nn.Name, "sent", rsize, "bytes", "; fanning out to", len(nn.Domains), "domains")
+			log.Println(nn.Name, "sent", rsize, "bytes:", rbuf, "fanning out to", len(nn.Domains), "domains")
 		}
-		rbuf := buf[:rsize]
 		for _, dom := range nn.Domains {
 			dom.fanoutBuffer(rbuf, nn)
 		}
