@@ -43,7 +43,7 @@ This example network can be visualised like in the following diagram:
 
  ![Broadcast domains in the example config file](example_domains.png)
 
-## Buffer size and data loss
+## Buffer size and data loss simulation
 
 Data is always read and written by the server in chunks of `buffer_size`, and random data loss chance is always calculated for such a buffer before data is received by each individual node. Consider the following extreme cases:
 
