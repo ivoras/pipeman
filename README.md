@@ -4,6 +4,8 @@ Pipeman is a nondeterministic simulator of broadcast domains organized into netw
 
 Pipeman uses Goroutines to perform all the simulated asynchronous tasks. While it's not an absolute guarantee of nondeterministic runs, it's pretty close to it.
 
+Pipeman supports IPv6.
+
 ## Example
 
 This JSON config file describes a network with three broadcast domains and four nodes:
