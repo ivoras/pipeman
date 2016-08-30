@@ -9,7 +9,7 @@ import (
 )
 
 // Cfg is the global configuration data
-var Cfg PipemanConfig
+var Cfg ConfigMain
 
 // AllNodes is the global list of all nodes
 var AllNodes map[string]*NetNode

@@ -11,7 +11,7 @@ import (
 
 // NetDomain represents a broadcast domain. It holds metadata and a list of nodes.
 type NetDomain struct {
-	CfgDomain *PipemanDomain
+	CfgDomain *ConfigDomain
 	Nodes     []*NetNode
 }
 
