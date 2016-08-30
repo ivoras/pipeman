@@ -63,7 +63,7 @@ func (dom *NetDomain) fanoutBuffer(buf []byte, sender *NetNode) {
 type NetNode struct {
 	Name     string
 	Domains  []*NetDomain
-	Conn     *net.TCPConn
+	Conn     net.Conn
 	ConnLock sync.Mutex
 }
 
