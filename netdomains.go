@@ -94,7 +94,11 @@ func (nn *NetNode) NetNodeRun() {
 		rbuf := make([]byte, rsize)
 		copy(rbuf, buf)
 		if Verbose {
-			log.Println(nn.Name, "sent", rsize, "bytes:", rbuf, "fanning out to", len(nn.Domains), "domains")
+			if rsize <= 16 {
+				log.Println(nn.Name, "sent", rsize, "bytes:", rbuf, "fanning out to", len(nn.Domains), "domains")
+			} else {
+				log.Println(nn.Name, "sent, fanning out to", len(nn.Domains), "domains")
+			}
 		}
 		for _, dom := range nn.Domains {
 			dom.fanoutBuffer(rbuf, nn)
