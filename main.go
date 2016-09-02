@@ -61,7 +61,9 @@ func handleConnection(conn net.Conn) {
 // tearDownNode is called when the node disconnects. It expects that the connection lock is held.
 func tearDownNode(nn *NetNode) {
 	if nn.Conn != nil {
-		nn.Conn.Close()
+		if err := nn.Conn.Close(); err != nil {
+			log.Printf("Connection close: %v", err)
+		}
 		nn.Conn = nil
 	}
 }
