@@ -29,8 +29,6 @@ func ReadConfig(fileName string) (ConfigMain, error) {
 	}
 
 	var cfg ConfigMain
-	if err = json.Unmarshal(f, &cfg); err != nil {
-		return cfg, err
-	}
-	return cfg, nil
+	err = json.Unmarshal(f, &cfg)
+	return cfg, err
 }
