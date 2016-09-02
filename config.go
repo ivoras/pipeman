@@ -63,3 +63,24 @@ func checkConfig() {
 		}
 	}
 }
+
+func checkConfigDomain() {
+	for _, pd := range Cfg.Network {
+		if pd.Loss < 0 {
+			log.Fatalln("Lost must be a positive decimal number")
+		}
+		if len(pd.Jitter) != 0 {
+			if len(pd.Jitter) != 2 {
+				log.Fatalln("Jitter must be specified as an array of 2 numbers: (#num1 +/- #num2) milliseconds")
+			}
+			for _, j := range pd.Jitter {
+				if j < 0 {
+					log.Fatalln("Jitter spec must be positive integers")
+				}
+			}
+			if pd.Jitter[1] > pd.Jitter[0] {
+				log.Fatalln("Jitter must be specified as an array of 2 numbers: (#num1 +/- #num2) milliseconds, #num2 < #num1")
+			}
+		}
+	}
+}
