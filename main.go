@@ -137,3 +137,15 @@ func main() {
 		go handleConnection(conn)
 	}
 }
+
+func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
+	all := make(map[string]*NetNode)
+	for di := range cfg.Network {
+		for _, nname := range cfg.Network[di].Nodes {
+			if _, ok := all[nname]; !ok {
+				all[nname] = &NetNode{Name: nname}
+			}
+		}
+	}
+	return all
+}
