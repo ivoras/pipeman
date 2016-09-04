@@ -96,27 +96,9 @@ func main() {
 	checkConfig()
 
 	// Parse the config into NetNode and NetDomain slices
-	AllNodes = make(map[string]*NetNode)
-	for di := range Cfg.Network {
-		for _, nname := range Cfg.Network[di].Nodes {
-			if _, ok := AllNodes[nname]; ok {
-				// Already exists
-				continue
-			}
-			AllNodes[nname] = new(NetNode)
-			AllNodes[nname].Name = nname
-		}
-	}
+	AllNodes = generateAllNodes(&Cfg)
 
-	AllDomains = make([]NetDomain, len(Cfg.Network))
-	for di := range Cfg.Network {
-		AllDomains[di].CfgDomain = &Cfg.Network[di]
-		AllDomains[di].Nodes = make([]*NetNode, len(Cfg.Network[di].Nodes))
-		for ni, nname := range Cfg.Network[di].Nodes {
-			AllDomains[di].Nodes[ni] = AllNodes[nname]
-			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &AllDomains[di])
-		}
-	}
+	AllDomains = generateAllDomains(&Cfg)
 
 	if Verbose {
 		log.Println("Working with", len(AllDomains), "domains and", len(AllNodes), "nodes.")
@@ -145,6 +127,19 @@ func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
 			if _, ok := all[nname]; !ok {
 				all[nname] = &NetNode{Name: nname}
 			}
+		}
+	}
+	return all
+}
+
+func generateAllDomains(cfg *ConfigMain) []NetDomain {
+	all := make([]NetDomain, len(cfg.Network))
+	for di := range cfg.Network {
+		all[di].CfgDomain = &cfg.Network[di]
+		all[di].Nodes = make([]*NetNode, len(cfg.Network[di].Nodes))
+		for ni, nname := range cfg.Network[di].Nodes {
+			all[di].Nodes[ni] = AllNodes[nname]
+			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &all[di])
 		}
 	}
 	return all
