@@ -97,7 +97,6 @@ func main() {
 
 	// Parse the config into NetNode and NetDomain slices
 	AllNodes = generateAllNodes(&Cfg)
-
 	AllDomains = generateAllDomains(&Cfg)
 
 	if Verbose {
