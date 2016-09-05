@@ -48,7 +48,7 @@ func handleConnection(conn net.Conn) {
 				if Verbose {
 					log.Println(conn, "is", line)
 				}
-				nn.NetNodeRun()
+				nn.Run()
 			} else {
 				log.Fatalln("First line in new connection needs to be the node name for:", conn)
 			}

@@ -67,8 +67,8 @@ type NetNode struct {
 	ConnLock sync.Mutex
 }
 
-// NetNodeRun runs the node receiver loop
-func (nn *NetNode) NetNodeRun() {
+// Run runs the node receiver loop
+func (nn *NetNode) Run() {
 	buf := make([]byte, Cfg.BufferSize)
 	for {
 		nn.ConnLock.Lock()
