@@ -8,23 +8,23 @@ import (
 	"os"
 )
 
-// Cfg is the global configuration data
+// Cfg is the global configuration data.
 var Cfg ConfigMain
 
-// AllNodes is the global list of all nodes
+// AllNodes is the global list of all nodes.
 var AllNodes map[string]*NetNode
 
-// AllDomains is the global list of all domains
+// AllDomains is the global list of all domains.
 var AllDomains []NetDomain
 
-// Verbose is the global log level
+// Verbose is the global log level.
 var Verbose bool
 
 func showUsage() {
 	fmt.Println("usage:", os.Args[0], "[-c config.json] [-v]")
 }
 
-// Handles the config phase of the connection
+// handleConnection handles the config phase of the connection.
 func handleConnection(conn net.Conn) {
 	var buf = make([]byte, 1)
 	var bline []byte
@@ -58,7 +58,8 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-// tearDownNode is called when the node disconnects. It expects that the connection lock is held.
+// tearDownNode is called when the node disconnects.
+// It expects that the connection lock is held.
 func tearDownNode(nn *NetNode) {
 	if nn.Conn != nil {
 		if err := nn.Conn.Close(); err != nil {

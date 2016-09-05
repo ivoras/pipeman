@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-// ConfigMain holds the JSON configuration structure for Pipeman
+// ConfigMain holds the JSON configuration structure for Pipeman.
 type ConfigMain struct {
 	Type       string         `json:"type"`
 	Port       int            `json:"port"`
@@ -14,7 +14,7 @@ type ConfigMain struct {
 	Network    []ConfigDomain `json:"network"`
 }
 
-// ConfigDomain holds a list of nodes belonging to the same group, with some metadata
+// ConfigDomain holds a list of nodes belonging to the same group, with some metadata.
 type ConfigDomain struct {
 	Name   string   `json:"name"`
 	Nodes  []string `json:"nodes"`
@@ -22,7 +22,7 @@ type ConfigDomain struct {
 	Jitter []int32  `json:"jitter"`
 }
 
-// ReadConfig reads a config file and returns the parsed PipemanConfig struct
+// ReadConfig reads a config file and returns the parsed PipemanConfig struct.
 func ReadConfig(fileName string) (ConfigMain, error) {
 	f, err := ioutil.ReadFile(fileName)
 	if err != nil {
