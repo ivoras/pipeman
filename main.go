@@ -58,17 +58,6 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-// tearDownNode is called when the node disconnects.
-// It expects that the connection lock is held.
-func tearDownNode(nn *NetNode) {
-	if nn.Conn != nil {
-		if err := nn.Conn.Close(); err != nil {
-			log.Printf("Connection close: %v", err)
-		}
-		nn.Conn = nil
-	}
-}
-
 func main() {
 	var configFile string
 	flag.StringVar(&configFile, "config", "config.json", "Config file name")
