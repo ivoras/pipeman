@@ -8,23 +8,23 @@ import (
 	"os"
 )
 
-// Cfg is the global configuration data
+// Cfg is the global configuration data.
 var Cfg ConfigMain
 
-// AllNodes is the global list of all nodes
+// AllNodes is the global list of all nodes.
 var AllNodes map[string]*NetNode
 
-// AllDomains is the global list of all domains
+// AllDomains is the global list of all domains.
 var AllDomains []NetDomain
 
-// Verbose is the global log level
+// Verbose is the global log level.
 var Verbose bool
 
 func showUsage() {
 	fmt.Println("usage:", os.Args[0], "[-c config.json] [-v]")
 }
 
-// Handles the config phase of the connection
+// handleConnection handles the config phase of the connection.
 func handleConnection(conn net.Conn) {
 	var buf = make([]byte, 1)
 	var bline []byte
@@ -48,51 +48,13 @@ func handleConnection(conn net.Conn) {
 				if Verbose {
 					log.Println(conn, "is", line)
 				}
-				nn.NetNodeRun()
+				nn.Run()
 			} else {
 				log.Fatalln("First line in new connection needs to be the node name for:", conn)
 			}
 			return
 		}
 		bline = append(bline, buf[0])
-	}
-}
-
-// tearDownNode is called when the node disconnects. It expects that the connection lock is held.
-func tearDownNode(nn *NetNode) {
-	if nn.Conn != nil {
-		nn.Conn.Close()
-		nn.Conn = nil
-	}
-}
-
-func checkConfig() {
-	if Cfg.Type != "pipeman" {
-		log.Fatalln("Invalid config file (missing type:\"pipeman\")")
-	}
-	if Cfg.BufferSize < 1 {
-		log.Fatalln("buffer_size must be at least 1")
-	}
-	if Cfg.Port < 0 {
-		log.Fatalln("port must be a positive integer")
-	}
-	for _, pd := range Cfg.Network {
-		if pd.Loss < 0 {
-			log.Fatalln("Lost must be a positive decimal number")
-		}
-		if len(pd.Jitter) != 0 {
-			if len(pd.Jitter) != 2 {
-				log.Fatalln("Jitter must be specified as an array of 2 numbers: (#num1 +/- #num2) milliseconds")
-			}
-			for _, j := range pd.Jitter {
-				if j < 0 {
-					log.Fatalln("Jitter spec must be positive integers")
-				}
-			}
-			if pd.Jitter[1] > pd.Jitter[0] {
-				log.Fatalln("Jitter must be specified as an array of 2 numbers: (#num1 +/- #num2) milliseconds, #num2 < #num1")
-			}
-		}
 	}
 }
 
@@ -103,18 +65,17 @@ func main() {
 	flag.BoolVar(&Verbose, "v", false, "Verbose output")
 	flag.Parse()
 
-	var err error
-
 	if _, err := os.Stat(configFile); err != nil {
-		fmt.Printf("Config file not found: '%s'\n", configFile)
+		fmt.Printf("Config file not found: %q\n", configFile)
 		showUsage()
 		flag.PrintDefaults()
 		return
 	}
 
+	var err error
 	Cfg, err = ReadConfig(configFile)
 	if err != nil {
-		fmt.Printf("Cannot parse config file: '%s': %v\n", configFile, err)
+		fmt.Printf("Cannot parse config file: %q: %v\n", configFile, err)
 		return
 	}
 
@@ -125,27 +86,8 @@ func main() {
 	checkConfig()
 
 	// Parse the config into NetNode and NetDomain slices
-	AllNodes = make(map[string]*NetNode)
-	for di := range Cfg.Network {
-		for _, nname := range Cfg.Network[di].Nodes {
-			if _, ok := AllNodes[nname]; ok {
-				// Already exists
-				continue
-			}
-			AllNodes[nname] = new(NetNode)
-			AllNodes[nname].Name = nname
-		}
-	}
-
-	AllDomains = make([]NetDomain, len(Cfg.Network))
-	for di := range Cfg.Network {
-		AllDomains[di].CfgDomain = &Cfg.Network[di]
-		AllDomains[di].Nodes = make([]*NetNode, len(Cfg.Network[di].Nodes))
-		for ni, nname := range Cfg.Network[di].Nodes {
-			AllDomains[di].Nodes[ni] = AllNodes[nname]
-			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &AllDomains[di])
-		}
-	}
+	AllNodes = generateAllNodes(&Cfg)
+	AllDomains = generateAllDomains(&Cfg)
 
 	if Verbose {
 		log.Println("Working with", len(AllDomains), "domains and", len(AllNodes), "nodes.")
@@ -165,4 +107,29 @@ func main() {
 		}
 		go handleConnection(conn)
 	}
+}
+
+func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
+	all := make(map[string]*NetNode)
+	for di := range cfg.Network {
+		for _, nname := range cfg.Network[di].Nodes {
+			if _, ok := all[nname]; !ok {
+				all[nname] = &NetNode{Name: nname}
+			}
+		}
+	}
+	return all
+}
+
+func generateAllDomains(cfg *ConfigMain) []NetDomain {
+	all := make([]NetDomain, len(cfg.Network))
+	for di := range cfg.Network {
+		all[di].CfgDomain = &cfg.Network[di]
+		all[di].Nodes = make([]*NetNode, len(cfg.Network[di].Nodes))
+		for ni, nname := range cfg.Network[di].Nodes {
+			all[di].Nodes[ni] = AllNodes[nname]
+			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &all[di])
+		}
+	}
+	return all
 }

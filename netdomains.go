@@ -9,7 +9,8 @@ import (
 	"time"
 )
 
-// NetDomain represents a broadcast domain. It holds metadata and a list of nodes.
+// NetDomain represents a broadcast domain.
+// It holds metadata and a list of nodes.
 type NetDomain struct {
 	CfgDomain *ConfigDomain
 	Nodes     []*NetNode
@@ -43,7 +44,7 @@ func (dom *NetDomain) fanoutBufferToNode(buf []byte, nn *NetNode) {
 	nn.ConnLock.Unlock()
 }
 
-// FanoutBuffer distributes the data in the given buf to all the nodes in this domain
+// FanoutBuffer distributes the data in the given buf to all the nodes in this domain.
 func (dom *NetDomain) fanoutBuffer(buf []byte, sender *NetNode) {
 	for _, nn := range dom.Nodes {
 		if nn == sender || nn.Conn == nil {
@@ -59,7 +60,7 @@ func (dom *NetDomain) fanoutBuffer(buf []byte, sender *NetNode) {
 	}
 }
 
-// NetNode represents one unique node in the network
+// NetNode represents one unique node in the network.
 type NetNode struct {
 	Name     string
 	Domains  []*NetDomain
@@ -67,8 +68,8 @@ type NetNode struct {
 	ConnLock sync.Mutex
 }
 
-// NetNodeRun runs the node receiver loop
-func (nn *NetNode) NetNodeRun() {
+// Run runs the node receiver loop.
+func (nn *NetNode) Run() {
 	buf := make([]byte, Cfg.BufferSize)
 	for {
 		nn.ConnLock.Lock()
@@ -104,4 +105,16 @@ func (nn *NetNode) NetNodeRun() {
 			dom.fanoutBuffer(rbuf, nn)
 		}
 	}
+}
+
+// tearDownNode is called when the node disconnects.
+// It expects that the connection lock is held.
+func tearDownNode(nn *NetNode) {
+	if nn == nil || nn.Conn == nil {
+		return
+	}
+	if err := nn.Conn.Close(); err != nil {
+		log.Printf("Connection close: %v", err)
+	}
+	nn.Conn = nil
 }
