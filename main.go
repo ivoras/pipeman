@@ -24,6 +24,31 @@ func showUsage() {
 	fmt.Println("usage:", os.Args[0], "[-c config.json] [-v]")
 }
 
+func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
+	all := make(map[string]*NetNode)
+	for di := range cfg.Network {
+		for _, nname := range cfg.Network[di].Nodes {
+			if _, ok := all[nname]; !ok {
+				all[nname] = &NetNode{Name: nname}
+			}
+		}
+	}
+	return all
+}
+
+func generateAllDomains(cfg *ConfigMain) []NetDomain {
+	all := make([]NetDomain, len(cfg.Network))
+	for di := range cfg.Network {
+		all[di].CfgDomain = &cfg.Network[di]
+		all[di].Nodes = make([]*NetNode, len(cfg.Network[di].Nodes))
+		for ni, nname := range cfg.Network[di].Nodes {
+			all[di].Nodes[ni] = AllNodes[nname]
+			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &all[di])
+		}
+	}
+	return all
+}
+
 // Handles the newly accepted connection. This function directly handles the config
 // phase of the protocol, and calls NeNodeRun() to handle the data handling part.
 func handleConnection(conn net.Conn) {
@@ -58,31 +83,6 @@ func handleConnection(conn net.Conn) {
 		}
 		bline = append(bline, buf[0])
 	}
-}
-
-func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
-	all := make(map[string]*NetNode)
-	for di := range cfg.Network {
-		for _, nname := range cfg.Network[di].Nodes {
-			if _, ok := all[nname]; !ok {
-				all[nname] = &NetNode{Name: nname}
-			}
-		}
-	}
-	return all
-}
-
-func generateAllDomains(cfg *ConfigMain) []NetDomain {
-	all := make([]NetDomain, len(cfg.Network))
-	for di := range cfg.Network {
-		all[di].CfgDomain = &cfg.Network[di]
-		all[di].Nodes = make([]*NetNode, len(cfg.Network[di].Nodes))
-		for ni, nname := range cfg.Network[di].Nodes {
-			all[di].Nodes[ni] = AllNodes[nname]
-			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &all[di])
-		}
-	}
-	return all
 }
 
 func main() {
