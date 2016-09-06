@@ -67,14 +67,14 @@ func main() {
 	flag.BoolVar(&Verbose, "v", false, "Verbose output")
 	flag.Parse()
 
-	if _, err := os.Stat(configFile); err != nil {
+	var err error
+	if _, err = os.Stat(configFile); err != nil {
 		fmt.Printf("Config file not found: %q\n", configFile)
 		showUsage()
 		flag.PrintDefaults()
 		return
 	}
 
-	var err error
 	Cfg, err = ReadConfig(configFile)
 	if err != nil {
 		fmt.Printf("Cannot parse config file: %q: %v\n", configFile, err)
