@@ -24,8 +24,10 @@ func showUsage() {
 	fmt.Println("usage:", os.Args[0], "[-c config.json] [-v]")
 }
 
-// handleConnection handles the config phase of the connection.
+// Handles the newly accepted connection. This function directly handles the config
+// phase of the protocol, and calls NeNodeRun() to handle the data handling part.
 func handleConnection(conn net.Conn) {
+	defer conn.Close() // Enforce the connection is closed and ignore errors.
 	var buf = make([]byte, 1)
 	var bline []byte
 	for {
