@@ -60,6 +60,31 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
+func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
+	all := make(map[string]*NetNode)
+	for di := range cfg.Network {
+		for _, nname := range cfg.Network[di].Nodes {
+			if _, ok := all[nname]; !ok {
+				all[nname] = &NetNode{Name: nname}
+			}
+		}
+	}
+	return all
+}
+
+func generateAllDomains(cfg *ConfigMain) []NetDomain {
+	all := make([]NetDomain, len(cfg.Network))
+	for di := range cfg.Network {
+		all[di].CfgDomain = &cfg.Network[di]
+		all[di].Nodes = make([]*NetNode, len(cfg.Network[di].Nodes))
+		for ni, nname := range cfg.Network[di].Nodes {
+			all[di].Nodes[ni] = AllNodes[nname]
+			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &all[di])
+		}
+	}
+	return all
+}
+
 func main() {
 	var configFile string
 	flag.StringVar(&configFile, "config", "config.json", "Config file name")
@@ -109,29 +134,4 @@ func main() {
 		}
 		go handleConnection(conn)
 	}
-}
-
-func generateAllNodes(cfg *ConfigMain) map[string]*NetNode {
-	all := make(map[string]*NetNode)
-	for di := range cfg.Network {
-		for _, nname := range cfg.Network[di].Nodes {
-			if _, ok := all[nname]; !ok {
-				all[nname] = &NetNode{Name: nname}
-			}
-		}
-	}
-	return all
-}
-
-func generateAllDomains(cfg *ConfigMain) []NetDomain {
-	all := make([]NetDomain, len(cfg.Network))
-	for di := range cfg.Network {
-		all[di].CfgDomain = &cfg.Network[di]
-		all[di].Nodes = make([]*NetNode, len(cfg.Network[di].Nodes))
-		for ni, nname := range cfg.Network[di].Nodes {
-			all[di].Nodes[ni] = AllNodes[nname]
-			AllNodes[nname].Domains = append(AllNodes[nname].Domains, &all[di])
-		}
-	}
-	return all
 }
