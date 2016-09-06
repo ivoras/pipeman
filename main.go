@@ -83,7 +83,7 @@ func main() {
 		fmt.Println(Cfg)
 	}
 
-	checkConfig()
+	Cfg.checkConfig()
 
 	// Parse the config into NetNode and NetDomain slices
 	AllNodes = generateAllNodes(&Cfg)

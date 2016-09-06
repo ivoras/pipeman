@@ -39,7 +39,7 @@ func (dom *NetDomain) fanoutBufferToNode(buf []byte, nn *NetNode) {
 				log.Println("Error reading connection:", nn.Name, err)
 			}
 		}
-		tearDownNode(nn)
+		nn.tearDownNode()
 	}
 	nn.ConnLock.Unlock()
 }
@@ -88,7 +88,7 @@ func (nn *NetNode) Run() {
 				}
 			}
 			nn.ConnLock.Lock()
-			tearDownNode(nn)
+			nn.tearDownNode()
 			nn.ConnLock.Unlock()
 			break
 		}
@@ -109,8 +109,8 @@ func (nn *NetNode) Run() {
 
 // tearDownNode is called when the node disconnects.
 // It expects that the connection lock is held.
-func tearDownNode(nn *NetNode) {
-	if nn == nil || nn.Conn == nil {
+func (nn *NetNode) tearDownNode() {
+	if nn.Conn == nil {
 		return
 	}
 	if err := nn.Conn.Close(); err != nil {

@@ -34,21 +34,21 @@ func ReadConfig(fileName string) (ConfigMain, error) {
 	return cfg, err
 }
 
-func checkConfig() {
-	if Cfg.Type != "pipeman" {
+func (cfg *ConfigMain) checkConfig() {
+	if cfg.Type != "pipeman" {
 		log.Fatalln("Invalid config file (missing type:\"pipeman\")")
 	}
-	if Cfg.BufferSize < 1 {
+	if cfg.BufferSize < 1 {
 		log.Fatalln("buffer_size must be at least 1")
 	}
-	if Cfg.Port < 0 {
+	if cfg.Port < 0 {
 		log.Fatalln("port must be a positive integer")
 	}
-	checkConfigDomain()
+	cfg.checkConfigDomain()
 }
 
-func checkConfigDomain() {
-	for _, pd := range Cfg.Network {
+func (cfg *ConfigMain) checkConfigDomain() {
+	for _, pd := range cfg.Network {
 		if pd.Loss < 0 {
 			log.Fatalln("Lost must be a positive decimal number")
 		}
